@@ -1,0 +1,56 @@
+image: php:8.3-cli
+
+stages: 
+  - build
+  - test
+  - push
+  - deploy
+
+before_script:
+  - apt-get update && apt-get install -y curl git unzip zip libzip-dev zlib1g-dev
+  - docker-php-ext-install zip
+  - pecl install xdebug && docker-php-ext-enable xdebug
+  - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+  - php -m | grep -E 'xml|mbstring'
+  - apt-get install -y lftp
+
+cache: 
+ paths:
+  - vendor/
+  - ~/.composer/cache
+
+build:
+  stage: build
+  script:
+    - echo "Build en cours..."
+    - composer install --prefer-dist --no-progress --no-suggest --no-
+  only:
+    - main
+
+test:
+  stage: test
+  variables:
+    XDEBUG_MODE: coverage
+  coverage: '/Lines:\s*(\d+(\.\d+)?%?)/'
+  script:
+    - echo "Test en cours..."
+    - composer grumphp
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: var/log/coverage/cobertura.xml
+  only:
+    - main
+
+push:
+  stage: push
+  script:
+    - echo "Push en cours..."
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploy en cours..."
+  only:
+    - prod
