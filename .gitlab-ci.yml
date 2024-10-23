@@ -26,6 +26,7 @@ build:
     - composer install --prefer-dist --no-progress --no-suggest --no-
   only:
     - main
+    - dev
 
 test:
   stage: test
@@ -42,6 +43,7 @@ test:
         path: var/log/coverage/cobertura.xml
   only:
     - main
+    - dev
 
 push:
   stage: push
