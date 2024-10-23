@@ -23,27 +23,27 @@ build:
   stage: build
   script:
     - echo "Build en cours..."
-    - composer install --prefer-dist --no-progress --no-suggest --no-
+    - composer install --prefer-dist --no-progress --no-suggest --no-interaction
   only:
-    - main
     - dev
+    - main
 
 test:
   stage: test
   variables:
     XDEBUG_MODE: coverage
-  coverage: '/Lines:\s*(\d+(\.\d+)?%?)/'
+  # coverage: '/Lines:\s*(\d+(\.\d+)?%?)/'
   script:
     - echo "Test en cours..."
     - composer grumphp
   artifacts:
-    reports:
-      coverage_report:
-        coverage_format: cobertura
-        path: var/log/coverage/cobertura.xml
+    # reports:
+    #   coverage_report:
+    #     coverage_format: cobertura
+    #     path: var/log/coverage/cobertura.xml
   only:
-    - main
     - dev
+    - main
 
 push:
   stage: push
