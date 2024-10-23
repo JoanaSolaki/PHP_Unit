@@ -2,6 +2,7 @@ body {
     margin: 0 auto;
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
+    color: black;
 }
 
 section {
@@ -11,10 +12,24 @@ section {
 }
 
 h1 {
-    background-color: rgb(58, 58, 181);
+    background-color: #172175;
     width: 100%;
-    padding: 10% 0;
+    padding: 5% 0;
     margin: 0;
+    font-size: 48px;
+}
+
+h2 {
+    font-size: 36px;
+}
+
+p {
+    font-size: 16px;
+}
+
+p span {
+    font-size: 48px;
+    font-weight: bold;
 }
 
 h1, h2 {
@@ -25,16 +40,12 @@ h1, h2 {
     color: white;
 } 
 
-.black {
-    color: black;
-}
-
-section.black {
-    background-color: burlywood;
+section.places {
+    background-color: #CDA929;
 }
 
 section.white {
-    background-color: brown;
+    background-color: #CC252A;
     display: flex;
     flex-flow: row;
 }
@@ -54,4 +65,43 @@ section.white div.image img {
 section.white div.block {
     width: 44%;
     margin: 0;
+}
+
+section.white div div {
+    color: black;
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+section.white div div label {
+    width: 40px;
+    margin-right: 60px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+section.white div div input {
+    width: 30%;
+    height: 30px;
+}
+
+button {
+    text-transform: uppercase;
+    color: white;
+    background-color: #172175;
+    border: none;
+    padding: 10px 20px;
+    font-size: 18px;
+    border-radius: 10px;
+    font-weight: bold;
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 0px 0px;
+    transition: 200ms;
+    cursor: pointer;
+}
+
+button:hover {
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+    background-color: #CC252A;
 }

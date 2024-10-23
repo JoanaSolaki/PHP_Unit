@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -15,6 +16,9 @@ class User implements UserInterface
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\Length(min: 6)]
+    #[Assert\Email(message: "Cette adresse email n'est pas valide.")]
+    #[Assert\NotBlank()]
     #[ORM\Column(length: 180)]
     private ?string $email = null;
 
@@ -24,9 +28,17 @@ class User implements UserInterface
     #[ORM\Column]
     private array $roles = [];
 
+    #[Assert\Length(min: 3)]
+    #[Assert\Regex(
+        "/^[a-zA-Z]+$/", 
+        message: "Le nom ne peut contenir que des lettres.")]
     #[ORM\Column(length: 100)]
     private ?string $Name = null;
 
+    #[Assert\Length(min: 3)]
+    #[Assert\Regex(
+        "/^[a-zA-Z]+$/", 
+        message: "Le prénom ne peut contenir que des lettres.")]
     #[ORM\Column(length: 100)]
     private ?string $Surname = null;
 

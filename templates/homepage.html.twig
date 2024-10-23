@@ -5,26 +5,29 @@
 {% block body %}
     <h1 class="white">Avant premières</h1>
 
-    <section class="black">
+    <section class="places">
         <p>Vous êtes invité.e à venir assister à l'avant première du dernier Marvel.</p>
         <div>
-            <h2>100</h2>
-            <p>places restantes</p>
+            <p><span>100<br>
+            </span>places restantes<p/>
         </div>
         <p class="white">Le 25 janvier 2025 au Pathé Chavant</p>
     </section>
 
     <section class="white">
         <div class="image">
-            <img src="{{ asset('img/marvel.jpeg') }}" alt="Affiche film Marvel">
+            <img src="{{ asset('img/marvel.jpg') }}" alt="Affiche film Marvel">
         </div>
         <div class="block">
+            {% for type, message in app.flashes %}
+                <div class="alert alert-{{ type }}">
+                    {{ message|join('. ') }}
+                </div>
+            {% endfor %}
             <h2>Dernier marvel</h2>
             <p>Réserver dès maintenant !</p>
-            {{ form_row(registrationForm.Name, {label: 'Nom'}) }}
-            {{ form_row(registrationForm.Surname, {label: 'Prénom'}) }}
-            {{ form_row(registrationForm.email, {label: 'Email'}) }}
-            {{ form_row(registrationForm.submit) }}
+            {{ form_start(registrationForm, {'attr': {'data-turbo': 'false'}})  }}
+            {{ form_end(registrationForm) }}
         </div>
     </section>
 {% endblock %}
