@@ -58,7 +58,7 @@
 image: php:8.3-cli
 
 variables:
-  DB_USER: root
+  DB_USER: runner
   DB_PASSWORD: password
   DB_HOST: mysql
   DB_PORT: 3306
@@ -71,7 +71,7 @@ services:
       MYSQL_USER: $DB_USER
       MYSQL_PASSWORD: $DB_PASSWORD
       MYSQL_DATABASE: $DB_NAME
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: root
 
 stages:
   - build
