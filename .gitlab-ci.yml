@@ -79,7 +79,7 @@ stages:
 
 before_script:
   # Update packages and install necessary dependencies.
-  - apt-get update && apt-get install -y curl git unzip zip libzip-dev zlib1g-dev
+  - apt-get update && apt-get install -y curl git unzip zip libzip-dev zlib1g-dev default-mysql-client
   # Install PHP extensions.
   - docker-php-ext-install zip pdo pdo_mysql
   - pecl install xdebug && docker-php-ext-enable xdebug
