@@ -27,6 +27,7 @@ before_script:
   - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
   - php -m | grep -E 'xml|mbstring'
   - apt-get install -y lftp
+  - echo "${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST:-mysql}:${DB_PORT:-3306}/${DB_NAME}"
   - php bin/console doctrine:database:create --env=test
   - php bin/console doctrine:migrations:migrate --no-interaction --env=test
 
