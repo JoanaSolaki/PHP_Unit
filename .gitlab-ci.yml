@@ -5,7 +5,7 @@ variables:
   DB_PASSWORD: 
   DB_HOST: mysql
   DB_PORT: 3306
-  DB_NAME: my_db
+  DB_NAME: phpunit
 
 services:
   - name: mysql:8.0
@@ -13,7 +13,6 @@ services:
     variables:
       MYSQL_USER: $DB_USER
       MYSQL_PASSWORD: $DB_PASSWORD
-      Tests, BDD et CI 6
       MYSQL_DATABASE: $DB_NAME
       MYSQL_ROOT_PASSWORD: root_password
 
@@ -28,7 +27,7 @@ before_script:
   - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
   - php -m | grep -E 'xml|mbstring'
   - apt-get install -y lftp
-  - composer test_db
+  # - composer test_db
 
 cache: 
  paths:
