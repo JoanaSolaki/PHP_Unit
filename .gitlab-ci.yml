@@ -1,3 +1,60 @@
+# image: php:8.3-cli
+
+# variables:
+#   DB_USER: root
+#   DB_PASSWORD:
+#   DB_HOST: mysql
+#   DB_PORT: 3306
+#   DB_NAME: phpunit
+
+# services:
+#   - name: mysql:8.0
+#     alias: mysql
+#     variables:
+#       MYSQL_USER: $DB_USER
+#       MYSQL_PASSWORD: $DB_PASSWORD
+#       MYSQL_DATABASE: $DB_NAME
+#       MYSQL_ROOT_PASSWORD: root_password
+
+# stages: 
+#   - build
+#   - test
+
+# before_script:
+#   - apt-get update && apt-get install -y curl git unzip zip libzip-dev zlib1g-dev
+#   - docker-php-ext-install zip pdo_mysql
+#   - pecl install xdebug && docker-php-ext-enable xdebug
+#   - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+#   - php -m | grep -E 'xml|mbstring'
+#   - apt-get install -y lftp
+#   - php bin/console doctrine:database:create --env=test
+#   - php bin/console doctrine:migrations:migrate --no-interaction --env=test
+
+# cache: 
+#  paths:
+#   - vendor/
+#   - ~/.composer/cache
+
+# build:
+#   stage: build
+#   script:
+#     - echo "Build en cours..."
+#     - composer install --prefer-dist --no-progress --no-suggest --no-interaction
+
+# test:
+#   stage: test
+#   variables:
+#     XDEBUG_MODE: coverage
+#   # coverage: '/Lines:\s*(\d+(\.\d+)?%?)/'
+#   script:
+#     - echo "Test en cours..."
+#     - composer grumphp
+#   artifacts:
+#     # reports:
+#     #   coverage_report:
+#     #     coverage_format: cobertura
+#     #     path: var/log/coverage/cobertura.xml
+
 image: php:8.3-cli
 
 variables:
@@ -14,44 +71,42 @@ services:
       MYSQL_USER: $DB_USER
       MYSQL_PASSWORD: $DB_PASSWORD
       MYSQL_DATABASE: $DB_NAME
-      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_ROOT_PASSWORD: 
 
-stages: 
+stages:
   - build
   - test
 
 before_script:
+  # Update packages and install necessary dependencies.
   - apt-get update && apt-get install -y curl git unzip zip libzip-dev zlib1g-dev
-  - docker-php-ext-install zip pdo_mysql
+  # Install PHP extensions.
+  - docker-php-ext-install zip pdo pdo_mysql
   - pecl install xdebug && docker-php-ext-enable xdebug
+  # Install Composer globally.
   - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-  - php -m | grep -E 'xml|mbstring'
-  - apt-get install -y lftp
-  - echo ${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST:-mysql}:${DB_PORT:-3306}/${DB_NAME}
+
+  # Create the test database.
+  - echo "${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?serverVersion=8.0.32&charset=utf8mb4"
   - php bin/console doctrine:database:create --env=test
   - php bin/console doctrine:migrations:migrate --no-interaction --env=test
+  - php bin/console doctrine:fixtures:load --append --no-interaction --env=test
 
-cache: 
- paths:
-  - vendor/
-  - ~/.composer/cache
+cache:
+  paths:
+    - vendor/
+    - ~/.composer/cache
 
 build:
   stage: build
   script:
-    - echo "Build en cours..."
-    - composer install --prefer-dist --no-progress --no-suggest --no-interaction
+    # Install project dependencies using Composer.
+    - composer install
 
 test:
   stage: test
-  variables:
-    XDEBUG_MODE: coverage
-  # coverage: '/Lines:\s*(\d+(\.\d+)?%?)/'
   script:
-    - echo "Test en cours..."
+    # Run code quality checks and tests with GrumPHP.
     - composer grumphp
-  artifacts:
-    # reports:
-    #   coverage_report:
-    #     coverage_format: cobertura
-    #     path: var/log/coverage/cobertura.xml
+    # Run PHPUnit tests.
+    - vendor/bin/phpunit
