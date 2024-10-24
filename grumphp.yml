@@ -1,4 +1,5 @@
 grumphp:
-    tasks: { 
-        phpunit: null 
-    }
+    tasks:
+        phpunit:
+            config_file: phpunit.xml.dist
+            always_execute: true

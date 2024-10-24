@@ -1,10 +1,25 @@
 image: php:8.3-cli
 
+variables:
+  DB_USER: root
+  DB_PASSWORD: 
+  DB_HOST: mysql
+  DB_PORT: 3306
+  DB_NAME: my_db
+
+services:
+  - name: mysql:8.0
+    alias: mysql
+    variables:
+      MYSQL_USER: $DB_USER
+      MYSQL_PASSWORD: $DB_PASSWORD
+      Tests, BDD et CI 6
+      MYSQL_DATABASE: $DB_NAME
+      MYSQL_ROOT_PASSWORD: root_password
+
 stages: 
   - build
   - test
-  - push
-  - deploy
 
 before_script:
   - apt-get update && apt-get install -y curl git unzip zip libzip-dev zlib1g-dev
@@ -13,6 +28,7 @@ before_script:
   - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
   - php -m | grep -E 'xml|mbstring'
   - apt-get install -y lftp
+  - composer test_db
 
 cache: 
  paths:
@@ -24,9 +40,6 @@ build:
   script:
     - echo "Build en cours..."
     - composer install --prefer-dist --no-progress --no-suggest --no-interaction
-  only:
-    - dev
-    - main
 
 test:
   stage: test
@@ -41,18 +54,3 @@ test:
     #   coverage_report:
     #     coverage_format: cobertura
     #     path: var/log/coverage/cobertura.xml
-  only:
-    - dev
-    - main
-
-push:
-  stage: push
-  script:
-    - echo "Push en cours..."
-
-deploy:
-  stage: deploy
-  script:
-    - echo "Deploy en cours..."
-  only:
-    - prod
