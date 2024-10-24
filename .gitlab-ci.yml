@@ -90,6 +90,11 @@ before_script:
       echo "Waiting for MySQL to be ready..."
       sleep 2;
     done
+    
+  # Supprimer l'utilisateur si il existe
+  - mysql -h "$DB_HOST" -u root -proot -e "DROP USER IF EXISTS '$DB_USER'@'%';"
+  
+  # Créer un nouvel utilisateur
   - mysql -h "$DB_HOST" -u root -proot -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';"
   - mysql -h "$DB_HOST" -u root -proot -e "GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'%';"
   - mysql -h "$DB_HOST" -u root -proot -e "FLUSH PRIVILEGES;"
