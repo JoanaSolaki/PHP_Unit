@@ -38,9 +38,7 @@ before_script:
   - php bin/console doctrine:migrations:migrate --no-interaction --env=test
 
   - composer install --prefer-dist --no-progress --no-suggest --no-interaction
-  # Lancer le serveur Symfony en arrière-plan
   - php -S 127.0.0.1:8000 -t public > server.log 2>&1 &
-  # Attendre que le serveur soit prêt
   - until curl -s http://127.0.0.1:8000; do echo "Waiting for Symfony server..."; sleep 5; done
 
 cache:
