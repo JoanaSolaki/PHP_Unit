@@ -9,7 +9,7 @@ if (file_exists(dirname(__DIR__) . '/config/bootstrap.php')) {
 } else {
     if (file_exists(dirname(__DIR__) . '/.env.test.local')) {
         (new Dotenv())->bootEnv(dirname(__DIR__) . '/.env.test.local');
-    } else if (file_exists(dirname(__DIR__) . '/.env.test')) {
+    } else {
         (new Dotenv())->bootEnv(dirname(__DIR__) . '/.env.test');
     }    
 }

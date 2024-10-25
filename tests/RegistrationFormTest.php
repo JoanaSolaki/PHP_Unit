@@ -7,7 +7,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class RegistrationFormTest extends WebTestCase {
     public function testFormSubmission() {
         $client = static::createClient();
-        
         $crawler = $client->request('GET', '/');
         $this->assertResponseIsSuccessful();
 
@@ -19,6 +18,7 @@ class RegistrationFormTest extends WebTestCase {
 
         $client->submit($form);
 
+        $this->assertResponseIsSuccessful();
         $this->assertResponseRedirects();
         $client->followRedirect();
         $this->assertSelectorTextContains('.alert-success', 'Votre inscription a bien été prise en compte !');
