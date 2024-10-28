@@ -20,6 +20,8 @@ services:
 stages:
   - build
   - test
+  - push
+  - deploy
 
 before_script:
   - apt-get update && apt-get install -y curl git unzip zip libzip-dev zlib1g-dev default-mysql-client
@@ -59,3 +61,34 @@ test:
   script:
     - echo "Test en cours..."
     - composer grumphp
+  only:
+    - dev
+
+push:
+  stage: push
+  script:
+    - echo "Push en cours..."
+    - git config --global user.name "CI-CD Robot"
+    - git config --global user.email "robot.gertrude@gmail.com"
+    - https://gitlab-ci-token:${CICD_ROBOT}git@gitlab.com:Solaki/php_unit.git HEAD:refs/heads/preprod
+  when:
+    - on_success
+  only:
+    - preprod
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploy en cours..."
+    - git clone --depth 1 --branch preprod $CI_REPOSITORY_URL main
+    - cd main
+    - git clean -fdx
+    - rm -rf .git .gitignore .gitlab-ci.yml README.md
+    - lftp -c "set sftp:auto-confirm yes; 
+               open -u $SFTP_USER,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT;
+               mirror --delete --verbose --reverse 
+               ./ /www/"
+  when:
+    - manual
+  only:
+    - main
