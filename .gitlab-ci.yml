@@ -53,6 +53,7 @@ build:
   stage: build
   script:
     - echo "Build en cours..."
+  when: on_success
 
 test:
   stage: test
@@ -61,6 +62,7 @@ test:
   script:
     - echo "Test en cours..."
     - composer grumphp
+  when: on_success
   only:
     - dev
 
@@ -71,8 +73,7 @@ push:
     - git config --global user.name "CI-CD Robot"
     - git config --global user.email "robot.gertrude@gmail.com"
     - https://gitlab-ci-token:${CICD_ROBOT}git@gitlab.com:Solaki/php_unit.git HEAD:refs/heads/preprod
-  when:
-    - on_success
+  when: on_success
   only:
     - preprod
 
@@ -88,7 +89,6 @@ deploy:
                open -u $SFTP_USER,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT;
                mirror --delete --verbose --reverse 
                ./ /www/"
-  when:
-    - manual
+  when: manual
   only:
     - main
