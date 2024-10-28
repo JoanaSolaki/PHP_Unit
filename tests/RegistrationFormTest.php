@@ -18,7 +18,6 @@ class RegistrationFormTest extends WebTestCase {
 
         $client->submit($form);
 
-        $this->assertResponseIsSuccessful();
         $this->assertResponseRedirects();
         $client->followRedirect();
         $this->assertSelectorTextContains('.alert-success', 'Votre inscription a bien été prise en compte !');
