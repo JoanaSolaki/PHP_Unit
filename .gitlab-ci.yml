@@ -72,7 +72,7 @@ push:
     - echo "Push en cours..."
     - git config --global user.name "CI-CD Robot"
     - git config --global user.email "robot.gertrude@gmail.com"
-    - https://gitlab-ci-token:${CICD_ROBOT}git@gitlab.com:Solaki/php_unit.git HEAD:refs/heads/preprod
+    - git push -u --force https://gitlab-ci-token:${CICD_ROBOT}@gitlab.com:Solaki/php_unit.git HEAD:refs/heads/preprod
   when: on_success
   only:
     - dev
@@ -85,10 +85,7 @@ deploy:
     - cd main
     - git clean -fdx
     - rm -rf .git .gitignore .gitlab-ci.yml README.md
-    - lftp -c "set sftp:auto-confirm yes; 
-               open -u $SFTP_USER,$SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT;
-               mirror --delete --verbose --reverse 
-               ./ /www/"
+    - lftp -c "set sftp:auto-confirm yes; open -u $SFTP_USER $SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; mirror --delete --verbose --reverse ./ /www/"
   when: manual
   only:
     - preprod
