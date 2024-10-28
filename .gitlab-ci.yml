@@ -75,7 +75,7 @@ push:
     - https://gitlab-ci-token:${CICD_ROBOT}git@gitlab.com:Solaki/php_unit.git HEAD:refs/heads/preprod
   when: on_success
   only:
-    - preprod
+    - dev
 
 deploy:
   stage: deploy
@@ -91,4 +91,4 @@ deploy:
                ./ /www/"
   when: manual
   only:
-    - main
+    - preprod
