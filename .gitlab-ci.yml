@@ -92,7 +92,8 @@ deploy:
     - cd main
     - git clean -fdx
     - rm -rf .git .gitignore .gitlab-ci.yml README.md
-    - lftp -c "set sftp:auto-confirm yes; open -u $SFTP_USER, $SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; mirror --delete --verbose --reverse ./ /www/"
+    - lftp -d -c "set sftp:auto-confirm yes; open -u \"$SFTP_USER\",\"$SFTP_PASSWORD\" sftp://$SFTP_HOST:$SFTP_PORT; mirror --delete --verbose --reverse ./ /www/"
+
   when: manual
   only:
     - preprod
