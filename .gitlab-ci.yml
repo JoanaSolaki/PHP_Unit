@@ -18,8 +18,8 @@ services:
       MYSQL_ROOT_PASSWORD: root
 
 stages:
-  # - build
-  # - test
+  - build
+  - test
   - push
   - deploy
 
@@ -36,6 +36,11 @@ before_script:
     - php -m | grep -E 'xml|mbstring'
     - apt-get install -y lftp
 
+build:
+  stage: build
+  script:
+    - echo "Build en cours..."
+    
     - mysql -h "$DB_HOST" -u root -proot -e "DROP USER IF EXISTS '$DB_USER'@'%';"
     - mysql -h "$DB_HOST" -u root -proot -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';"
     - mysql -h "$DB_HOST" -u root -proot -e "GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'%';"
@@ -48,30 +53,20 @@ before_script:
 
     - php -S 127.0.0.1:8000 -t public > server.log 2>&1 &
     - until curl -s http://127.0.0.1:8000; do echo "Waiting for Symfony server..."; sleep 5; done
+  when: on_success
 
-# build:
-#   stage: build
-#   script:
-#     - echo "Build en cours..."
-#   when: on_success
-#   artifacts:
-#     paths:
-#       - vendor/
-#       - var/
-
-# test:
-#   stage: test
-#   variables:
-#     XDEBUG_MODE: coverage
-#   needs:
-#     - job: build
-#       artifacts: true
-#   script:
-#     - echo "Test en cours..."
-#     - composer grumphp
-#   when: on_success
-#   only:
-#     - dev
+test:
+  stage: test
+  variables:
+    XDEBUG_MODE: coverage
+  needs:
+    - job: build
+  script:
+    - echo "Test en cours..."
+    - composer grumphp
+  when: on_success
+  only:
+    - dev
 
 push:
   stage: push
