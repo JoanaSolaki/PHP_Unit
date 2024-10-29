@@ -40,6 +40,8 @@ build:
   stage: build
   script:
     - echo "Build en cours..."
+
+    - sleep 2
    
     - mysql -h "$DB_HOST" -u root -proot -e "DROP USER IF EXISTS '$DB_USER'@'%';"
     - mysql -h "$DB_HOST" -u root -proot -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';"
@@ -65,6 +67,8 @@ test:
     - job: build
   script:
     - echo "Test en cours..."
+    - mysql -h "$DB_HOST" -u root -proot -e "CREATE DATABASE IF NOT EXISTS phpunit_test;"
+    - php bin/console doctrine:schema:create --env=test --if-not-exists
     - composer grumphp
   when: on_success
   only:
@@ -76,7 +80,7 @@ push:
     - echo "Push en cours..."
     - git config --global user.name "CI-CD Robot"
     - git config --global user.email "robot.gertrude@gmail.com"
-    - git push -v -u --force https://gitlab-ci-token:$CICD_ROBOT@gitlab.com/Solaki/php_unit.git HEAD:refs/heads/preprod
+    - git push -v -u --force "https://gitlab-ci-token:${CICD_ROBOT}@gitlab.com/Solaki/php_unit.git" HEAD:refs/heads/preprod
   when: on_success
   only:
     - dev
