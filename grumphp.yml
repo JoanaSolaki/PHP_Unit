@@ -1,4 +1,7 @@
 grumphp:
+    ascii:
+        failed: failed.txt
+        succeeded: succeeded.txt
     tasks:
         phpunit:
             config_file: phpunit.xml.dist

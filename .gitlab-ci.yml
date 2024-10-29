@@ -44,11 +44,6 @@ build:
     - php bin/console importmap:install
     - php bin/console asset:install
 
-    # - mysql -h "$DB_HOST" -u root -proot -e "DROP USER IF EXISTS '$DB_USER'@'%';"
-    # - mysql -h "$DB_HOST" -u root -proot -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';"
-    # - mysql -h "$DB_HOST" -u root -proot -e "GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'%';"
-    # - mysql -h "$DB_HOST" -u root -proot -e "FLUSH PRIVILEGES;"
-
     - composer install --prefer-dist --no-progress --no-suggest --no-interaction
 
     - php bin/console doctrine:database:create --if-not-exists
@@ -97,7 +92,7 @@ deploy:
     - cd main
     - git clean -fdx
     - rm -rf .git .gitignore .gitlab-ci.yml README.md
-    - lftp -c "set sftp:auto-confirm yes; open -u $SFTP_USER $SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; mirror --delete --verbose --reverse ./ /www/"
+    - lftp -c "set sftp:auto-confirm yes; open -u $SFTP_USER, $SFTP_PASSWORD sftp://$SFTP_HOST:$SFTP_PORT; mirror --delete --verbose --reverse ./ /www/"
   when: manual
   only:
     - preprod
