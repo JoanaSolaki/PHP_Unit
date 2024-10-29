@@ -67,8 +67,7 @@ test:
     - job: build
   script:
     - echo "Test en cours..."
-    - mysql -h "$DB_HOST" -u root -proot -e "CREATE DATABASE IF NOT EXISTS phpunit_test;"
-    - php bin/console doctrine:schema:create --env=test --if-not-exists
+    - php bin/console doctrine:schema:create --env=test
     - composer grumphp
   when: on_success
   only:
