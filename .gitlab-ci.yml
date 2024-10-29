@@ -41,8 +41,6 @@ build:
   script:
     - echo "Build en cours..."
 
-    - sleep 2
-   
     - mysql -h "$DB_HOST" -u root -proot -e "DROP USER IF EXISTS '$DB_USER'@'%';"
     - mysql -h "$DB_HOST" -u root -proot -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';"
     - mysql -h "$DB_HOST" -u root -proot -e "GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'%';"
@@ -71,6 +69,8 @@ test:
     - mysql -h "$DB_HOST" -u root -proot -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';"
     - mysql -h "$DB_HOST" -u root -proot -e "GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'%';"
     - mysql -h "$DB_HOST" -u root -proot -e "FLUSH PRIVILEGES;"
+    - php bin/console doctrine:database:create --env=test
+    - php bin/console doctrine:migrations:migrate --no-interaction --env=test
     - php bin/console doctrine:schema:create --env=test
     - composer grumphp
   when: on_success
