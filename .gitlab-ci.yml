@@ -48,6 +48,8 @@ build:
 
     - composer install --prefer-dist --no-progress --no-suggest --no-interaction
 
+    - php bin/console doctrine:database:create
+    - php bin/console doctrine:migrations:migrate --no-interaction
     - php bin/console doctrine:database:create --env=test
     - php bin/console doctrine:migrations:migrate --no-interaction --env=test
 
