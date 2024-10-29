@@ -29,13 +29,6 @@ cache:
     - ~/.composer/cache
 
 before_script:
-  - apt-get update && apt-get install -y default-mysql-client
-  - docker-php-ext-install pdo pdo_mysql
-
-build:
-  stage: build
-  script:
-    - echo "Build en cours..."
     - apt-get update && apt-get install -y curl git unzip zip libzip-dev zlib1g-dev default-mysql-client
     - docker-php-ext-install zip pdo pdo_mysql
     - pecl install xdebug && docker-php-ext-enable xdebug
@@ -55,13 +48,16 @@ build:
 
     - php -S 127.0.0.1:8000 -t public > server.log 2>&1 &
     - until curl -s http://127.0.0.1:8000; do echo "Waiting for Symfony server..."; sleep 5; done
+
+build:
+  stage: build
+  script:
+    - echo "Build en cours..."
   when: on_success
   artifacts:
     paths:
       - vendor/
       - var/
-      - bin/
-    expire_in: 1 hour
 
 test:
   stage: test
@@ -72,8 +68,6 @@ test:
       artifacts: true
   script:
     - echo "Test en cours..."
-    - php bin/console doctrine:database:create --env=test --if-not-exists
-    - php bin/console doctrine:migrations:migrate --no-interaction --env=test
     - composer grumphp
   when: on_success
   only:
