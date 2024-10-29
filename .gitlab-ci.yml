@@ -72,7 +72,7 @@ push:
     - echo "Push en cours..."
     - git config --global user.name "CI-CD Robot"
     - git config --global user.email "robot.gertrude@gmail.com"
-    - git push -u --force https://gitlab-ci-token:${CICD_ROBOT}@gitlab.com:Solaki/php_unit.git HEAD:refs/heads/preprod
+    - git push -u --force https://gitlab-ci-token:${CICD_ROBOT}@gitlab.com/Solaki/php_unit.git HEAD:refs/heads/preprod
   when: on_success
   only:
     - dev
