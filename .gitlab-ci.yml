@@ -67,6 +67,10 @@ test:
     - job: build
   script:
     - echo "Test en cours..."
+    - mysql -h "$DB_HOST" -u root -proot -e "DROP USER IF EXISTS '$DB_USER'@'%';"
+    - mysql -h "$DB_HOST" -u root -proot -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';"
+    - mysql -h "$DB_HOST" -u root -proot -e "GRANT ALL PRIVILEGES ON *.* TO '$DB_USER'@'%';"
+    - mysql -h "$DB_HOST" -u root -proot -e "FLUSH PRIVILEGES;"
     - php bin/console doctrine:schema:create --env=test
     - composer grumphp
   when: on_success
