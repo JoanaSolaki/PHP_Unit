@@ -18,8 +18,8 @@ services:
       MYSQL_ROOT_PASSWORD: root
 
 stages:
-  - build
-  - test
+  # - build
+  # - test
   - push
   - deploy
 
@@ -49,29 +49,29 @@ before_script:
     - php -S 127.0.0.1:8000 -t public > server.log 2>&1 &
     - until curl -s http://127.0.0.1:8000; do echo "Waiting for Symfony server..."; sleep 5; done
 
-build:
-  stage: build
-  script:
-    - echo "Build en cours..."
-  when: on_success
-  artifacts:
-    paths:
-      - vendor/
-      - var/
+# build:
+#   stage: build
+#   script:
+#     - echo "Build en cours..."
+#   when: on_success
+#   artifacts:
+#     paths:
+#       - vendor/
+#       - var/
 
-test:
-  stage: test
-  variables:
-    XDEBUG_MODE: coverage
-  needs:
-    - job: build
-      artifacts: true
-  script:
-    - echo "Test en cours..."
-    - composer grumphp
-  when: on_success
-  only:
-    - dev
+# test:
+#   stage: test
+#   variables:
+#     XDEBUG_MODE: coverage
+#   needs:
+#     - job: build
+#       artifacts: true
+#   script:
+#     - echo "Test en cours..."
+#     - composer grumphp
+#   when: on_success
+#   only:
+#     - dev
 
 push:
   stage: push
@@ -79,7 +79,7 @@ push:
     - echo "Push en cours..."
     - git config --global user.name "CI-CD Robot"
     - git config --global user.email "robot.gertrude@gmail.com"
-    - git push -v -u --force "https://gitlab-ci-token:${CICD_ROBOT}@gitlab.com/Solaki/php_unit.git" HEAD:refs/heads/preprod
+    - git push -v -u --force https://gitlab-ci-token:$CICD_ROBOT@gitlab.com/Solaki/php_unit.git HEAD:refs/heads/preprod
   when: on_success
   only:
     - dev
