@@ -20,31 +20,33 @@ services:
 stages:
   - build
   - test
-  - push
-  - deploy
+  - push_preprod
+  - deploy_preprod
+  - push_prod
+  - deploy_prod
 
 cache:
   paths:
     - vendor/
     - ~/.composer/cache
 
-before_script:
-    - apt-get update && apt-get install -y curl git unzip zip libzip-dev zlib1g-dev default-mysql-client
-    - docker-php-ext-install zip pdo pdo_mysql
-    - pecl install xdebug && docker-php-ext-enable xdebug
-    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-    - php -m | grep -E 'xml|mbstring'
-    - apt-get install -y lftp
+.php_setup: &php_setup
+  before_script:
+      - apt-get update && apt-get install -y curl git unzip zip libzip-dev zlib1g-dev default-mysql-client
+      - docker-php-ext-install zip pdo pdo_mysql
+      - pecl install xdebug && docker-php-ext-enable xdebug
+      - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+      - php -m | grep -E 'xml|mbstring'
+      - apt-get install -y lftp
 
 build:
+  <<: *php_setup
   stage: build
   script:
     - echo "Build en cours..."
-
+    - composer install --prefer-dist --no-progress --no-suggest --no-interaction
     - php bin/console importmap:install
     - php bin/console asset:install
-
-    - composer install --prefer-dist --no-progress --no-suggest --no-interaction
 
     - php bin/console doctrine:database:create --if-not-exists
     - php bin/console doctrine:migrations:migrate --no-interaction
@@ -52,8 +54,11 @@ build:
     - php -S 127.0.0.1:8000 -t public > server.log 2>&1 &
     - until curl -s http://127.0.0.1:8000; do echo "Waiting for Symfony server..."; sleep 5; done
   when: on_success
+  only:
+   - dev
 
 test:
+  <<: *php_setup
   stage: test
   variables:
     XDEBUG_MODE: coverage
@@ -73,27 +78,93 @@ test:
   only:
     - dev
 
-push:
-  stage: push
+push_preprod:
+  image: alpine:latest
+  stage: push_preprod
+  before_script:
+    - apk add --no-cache git
   script:
     - echo "Push en cours..."
+    - |
+      cat <<- EOF > .gitignore
+      .editor-config
+      *.xml
+      *.lock
+      *.disabled
+      grumphp.yml
+      src/tests
+
+      /.env.local
+      /.env.local.php
+      /.env.*.local
+      /config/secrets/prod/prod.decrypt.private.php
+      /config/secrets/dev/dev.decrypt.private.php
+      /public/bundles/
+      /var/
+      /vendor/
+      /phpunit.xml
+      .phpunit.result.cache
+      .phpunit.result.cache
+      /phpunit.xml
+      /public/assets/
+      /assets/vendor/
+
+      EOF
+
     - git config --global user.name "CI-CD Robot"
     - git config --global user.email "robot.gertrude@gmail.com"
+
+    - git init
+    - git add .gitignore
+    - git commit -m"Update .gitignore" -n || echo "No changes to commit"
+
     - git push -v -u --force "https://gitlab-ci-token:${CICD_ROBOT}@gitlab.com/Solaki/php_unit.git" HEAD:refs/heads/preprod
   when: on_success
   only:
     - dev
 
-deploy:
-  stage: deploy
+deploy_preprod:
+  image: alpine:latest
+  stage: deploy_preprod
+  before_script:
+    - apk add --no-cache lftp openssh-client
   script:
     - echo "Deploy en cours..."
     - git clone --depth 1 --branch preprod $CI_REPOSITORY_URL main
     - cd main
     - git clean -fdx
     - rm -rf .git .gitignore .gitlab-ci.yml README.md
-    - lftp -d -c "set sftp:auto-confirm yes; open -u \"$SFTP_USER\",\"$SFTP_PASSWORD\" sftp://$SFTP_HOST:$SFTP_PORT; mirror --delete --verbose --reverse ./ /www/"
-
+    - lftp -d -c "set sftp:auto-confirm yes; set net:max-retries 3; open -u \"$SFTP_USER\",\"$SFTP_PASSWORD\" sftp://$SFTP_HOST:$SFTP_PORT; mirror --delete --verbose --reverse ./ /www/preprod"
   when: manual
   only:
     - preprod
+
+push_prod:
+  image: alpine:latest
+  stage: push_prod
+  before_script:
+    - apk add --no-cache git
+  script:
+    - echo "Push en cours..."
+    - git config --global user.name "CI-CD Robot V2"
+    - git config --global user.email "robot.terminator@gmail.com"
+    - git push -v -u --force "https://gitlab-ci-token:${CICD_ROBOTV2}@gitlab.com/Solaki/php_unit.git" HEAD:refs/heads/main
+  when: on_success
+  only:
+    - preprod
+
+deploy_prod:
+  image: alpine:latest
+  stage: deploy_prod
+  before_script:
+    - apk add --no-cache lftp openssh-client
+  script:
+    - echo "Deploy en cours..."
+    - git clone --depth 1 --branch preprod $CI_REPOSITORY_URL main
+    - cd main
+    - git clean -fdx
+    - rm -rf .git .gitignore .gitlab-ci.yml README.md
+    - lftp -d -c "set sftp:auto-confirm yes; set net:max-retries 3; open -u \"$SFTP_USER\",\"$SFTP_PASSWORD\" sftp://$SFTP_HOST:$SFTP_PORT; mirror --delete --verbose --reverse ./ /www/prod"
+  when: manual
+  only:
+    - main
